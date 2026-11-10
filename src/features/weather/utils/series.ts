@@ -19,16 +19,16 @@ export function localHourKey(date: Date, timezone: string): string {
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
-    hour12: false,
+    // `hourCycle: 'h23'` rather than `hour12: false`, which can render
+    // midnight as "24" — and "24" paired with that day's date would name an
+    // instant a full day earlier than intended.
+    hourCycle: 'h23',
   }).formatToParts(date);
 
   const get = (type: Intl.DateTimeFormatPartTypes): string =>
     parts.find((part) => part.type === type)?.value ?? '00';
 
-  // `hour12: false` can render midnight as "24" in some engines.
-  const hour = get('hour') === '24' ? '00' : get('hour');
-
-  return `${get('year')}-${get('month')}-${get('day')}T${hour}:00`;
+  return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:00`;
 }
 
 /** Local `YYYY-MM-DD` key for an instant, in the given zone. */

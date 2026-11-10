@@ -1,6 +1,7 @@
 'use client';
 
 import { AirQualityView } from '@/features/air-quality/components/air-quality-view';
+import { AnalyticsView } from '@/features/analytics/components/analytics-view';
 import { CityView } from '@/features/city/components/city-view';
 import { TrafficView } from '@/features/traffic/components/traffic-view';
 import { TransportationView } from '@/features/transportation/components/transportation-view';
@@ -39,6 +40,8 @@ export function ViewRouter() {
       return <TrafficView />;
     case 'transportation':
       return <TransportationView />;
+    case 'analytics':
+      return <AnalyticsView />;
     case 'settings':
       return <SettingsView />;
     default:

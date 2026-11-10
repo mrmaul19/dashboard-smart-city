@@ -360,3 +360,73 @@ teleporting vehicles.
 
 Congestion is emergent, not scripted: vehicles slow where they are dense, which
 makes them denser still.
+
+## Analytics and charts (phase 6)
+
+### Caching migrated to `use cache`
+
+Next's bundled documentation (`node_modules/next/dist/docs/`, which this
+project's `AGENTS.md` directs agents to read) states for Cache Components:
+**"Move `cache` and `next` options to `use cache`."** Both services used
+`next: { revalidate }` on the fetch, which is the pre-Cache-Components model.
+
+Both now use the `use cache` directive with an inline `cacheLife` profile —
+weather `revalidate: 600`, air quality `revalidate: 900`, matching the CDN
+headers the routes already set. Query parameters are read in the route, outside
+the cached scope, and passed as arguments, which the docs require: a cached
+function cannot touch runtime APIs.
+
+Caching the whole mapping rather than just the HTTP response means a cached
+payload keeps the `fetchedAt` of the request that actually produced it.
+
+Verified live: cold request 2.25 s, subsequent requests 71–79 ms.
+
+### Historical series
+
+Weather history now comes from `past_days=7` on the same forecast request — no
+second endpoint and no extra quota. Measured: **336 hourly points** (7 past + 7
+forecast days) and 14 daily, in a 46 KB payload. Real ranges over the week:
+24.1–36.9 °C, 35–98% RH.
+
+Pollutant history comes from the `/hours` requests the AQI **already** makes,
+so the trend charts add zero upstream requests.
+
+### Chart palette
+
+Series colours are a palette separate from the reserved provenance, AQI and
+congestion colours — a status colour must never double as "series 3".
+
+The pair actually co-plotted (PM2.5 against PM10) passes every validator check
+in **both** themes: adjacent separation ΔE 20.4 under simulated protanopia,
+23.0 for normal vision, inside the lightness band, above 3:1 contrast on both
+the dark and light surfaces.
+
+The full four-hue set does **not** pass as a four-series categorical palette
+(slots 2 and 3 separate by only ΔE 4.8 under deuteranopia). That is accepted
+because no chart plots more than two series, and `seriesColours()` **throws**
+if asked for three or more rather than silently degrading accessibility.
+
+### A silent off-by-one, found by checking
+
+The trend charts trim the series at the current hour. The first implementation
+built the comparison key by hand and omitted the minutes, producing
+`2026-11-10T15`. Because `"2026-11-10T15:00" > "2026-11-10T15"` is true by
+string length, **the current hour was silently dropped from every chart.**
+
+Worse, the key used `hour12: false`, which some engines render as `"24"` at
+midnight; combined with that day's date, `24` names an instant a full day
+earlier than intended.
+
+Both are fixed: the shared `localHourKey` helper is reused instead of a second
+implementation, and it now uses `hourCycle: 'h23'`, which cannot produce `24`.
+Verified against the live payload: the window ends at the current hour
+(`2026-11-10T15:00` included, `16:00` excluded), is exactly 24 or 168 points,
+and `2026-11-09T17:30Z` correctly maps to `2026-11-10T00:00` in `Asia/Jakarta`.
+
+### Traffic history is a model, not a recording
+
+No open historical congestion data exists for Jakarta, and the live simulation
+only holds state while the 3D view is open. The traffic chart therefore plots an
+explicit twin-peak daily model scaled by the current density setting, labelled
+SIMULATED and captioned as neither a measurement nor a recording — which is
+what spec §8 permits for simulated history.

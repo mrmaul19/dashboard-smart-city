@@ -1,52 +1,50 @@
 'use client';
 
 import { useState } from 'react';
+import { ProvenanceBadge } from '@/components/ui/provenance-badge';
+import { TimeSeriesChart } from '@/components/charts/time-series-chart';
+import {
+  usePollutantTrend,
+  useTrafficTrend,
+  useWeatherTrend,
+} from '@/features/analytics/hooks/use-trends';
 import { cn } from '@/lib/utils/cn';
+import type { Provenance } from '@/types/data-envelope';
 import { Attribution } from './attribution';
 
+type TabId = 'temperature' | 'air-quality' | 'traffic' | 'humidity';
+
 interface AnalyticsTab {
-  readonly id: string;
+  readonly id: TabId;
   readonly label: string;
-  /** Named so the placeholder can say exactly where the series will come from. */
-  readonly source: string;
-  readonly phase: number;
+  readonly provenance: Provenance;
 }
 
 const TABS: readonly AnalyticsTab[] = [
-  {
-    id: 'temperature',
-    label: 'Temperature',
-    source: 'Open-Meteo hourly forecast and ERA5 archive',
-    phase: 3,
-  },
-  {
-    id: 'air-quality',
-    label: 'Air quality',
-    source: 'OpenAQ hourly sensor aggregates',
-    phase: 4,
-  },
-  {
-    id: 'traffic',
-    label: 'Traffic density',
-    source: 'the local traffic simulation (not a measurement)',
-    phase: 5,
-  },
-  {
-    id: 'environment',
-    label: 'Environmental trends',
-    source: 'Open-Meteo and OpenAQ history',
-    phase: 6,
-  },
+  { id: 'temperature', label: 'Temperature', provenance: 'REAL' },
+  { id: 'humidity', label: 'Humidity', provenance: 'REAL' },
+  { id: 'air-quality', label: 'Air quality', provenance: 'REAL' },
+  { id: 'traffic', label: 'Traffic density', provenance: 'SIMULATED' },
 ] as const;
 
 /**
- * Bottom analytics panel (spec §3). Charts arrive with their data in phases
- * 3-6; until a real series exists, each tab names its future source rather
- * than rendering invented sample data.
+ * Bottom analytics panel.
+ *
+ * A compact companion to the Analytics view, sharing its series through the
+ * same hooks so the two can never disagree. The table toggle is kept even at
+ * this size: it is the accessible path to the values, not a convenience.
+ *
+ * Each tab carries the provenance of what it plots, because they differ — the
+ * traffic tab is a model, the others are measurements.
  */
 export function AnalyticsPanel() {
-  const [activeTab, setActiveTab] = useState<string>(TABS[0].id);
-  const tab = TABS.find((t) => t.id === activeTab) ?? TABS[0];
+  const [activeTab, setActiveTab] = useState<TabId>('temperature');
+  const tab = TABS.find((item) => item.id === activeTab) ?? TABS[0];
+
+  // The panel always shows 24 hours; the full view offers the range control.
+  const { rows: weatherRows } = useWeatherTrend('24h');
+  const pollutants = usePollutantTrend('24h');
+  const trafficRows = useTrafficTrend();
 
   return (
     <div className="flex h-full flex-col">
@@ -55,36 +53,77 @@ export function AnalyticsPanel() {
         role="tablist"
         aria-label="Analytics series"
       >
-        {TABS.map((t) => (
+        {TABS.map((item) => (
           <button
-            key={t.id}
+            key={item.id}
             type="button"
             role="tab"
-            aria-selected={t.id === activeTab}
-            onClick={() => setActiveTab(t.id)}
+            aria-selected={item.id === activeTab}
+            onClick={() => setActiveTab(item.id)}
             className={cn(
               'shrink-0 border-b-2 px-2.5 py-2 text-xs transition-colors',
-              t.id === activeTab
+              item.id === activeTab
                 ? 'border-accent text-accent-text'
                 : 'border-transparent text-muted hover:text-fg',
             )}
           >
-            {t.label}
+            {item.label}
           </button>
         ))}
-        <Attribution className="ml-auto hidden pr-1 lg:flex" />
+        <div className="ml-auto flex shrink-0 items-center gap-2 pr-1">
+          <ProvenanceBadge provenance={tab.provenance} />
+          <Attribution className="hidden xl:flex" />
+        </div>
       </div>
 
-      <div
-        role="tabpanel"
-        className="flex flex-1 items-center justify-center p-4 text-center"
-      >
-        <div className="space-y-1">
-          <p className="text-xs text-muted">
-            {tab.label} chart will be drawn from {tab.source}.
-          </p>
-          <p className="panel-heading">Arrives in phase {tab.phase}</p>
-        </div>
+      <div role="tabpanel" className="min-h-0 flex-1 overflow-y-auto px-3 py-2">
+        {tab.id === 'temperature' ? (
+          <TimeSeriesChart
+            rows={weatherRows}
+            series={[{ key: 'temperature', label: 'Temperature', unit: '°C' }]}
+            height={104}
+            maxTicks={6}
+            footnote="Open-Meteo hourly, last 24 h"
+          />
+        ) : null}
+
+        {tab.id === 'humidity' ? (
+          <TimeSeriesChart
+            rows={weatherRows}
+            series={[{ key: 'humidity', label: 'Humidity', unit: '%' }]}
+            precision={0}
+            height={104}
+            maxTicks={6}
+            footnote="Open-Meteo hourly, last 24 h"
+          />
+        ) : null}
+
+        {tab.id === 'air-quality' ? (
+          pollutants.series.length > 0 ? (
+            <TimeSeriesChart
+              rows={pollutants.rows}
+              series={pollutants.series}
+              height={104}
+              maxTicks={6}
+              footnote="OpenAQ hourly means from the nearest reporting station"
+            />
+          ) : (
+            <p className="p-3 text-center text-[11px] text-dim">
+              {pollutants.emptyReason ?? 'Loading station history…'}
+            </p>
+          )
+        ) : null}
+
+        {tab.id === 'traffic' ? (
+          <TimeSeriesChart
+            rows={trafficRows}
+            series={[{ key: 'density', label: 'Density', unit: '%' }]}
+            precision={0}
+            height={104}
+            maxTicks={8}
+            footnote="Modelled daily profile — not a measurement or a recording"
+          />
+        ) : null}
       </div>
     </div>
   );

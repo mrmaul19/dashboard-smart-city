@@ -17,7 +17,7 @@ Built incrementally, one phase at a time.
 | 3 | Live weather (Open-Meteo) | **Done** |
 | 4 | Air quality (OpenAQ v3) | **Done** (needs an API key to serve data) |
 | 5 | Traffic simulation and Transjakarta GTFS | **Done** |
-| 6 | Analytics and charts | Not started |
+| 6 | Analytics and charts | **Done** |
 | 7 | Optimisation and deployment | Not started |
 
 Views belonging to a later phase render an explicit placeholder naming the
