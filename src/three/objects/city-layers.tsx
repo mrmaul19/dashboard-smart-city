@@ -89,10 +89,13 @@ export function BuildingsLayer({
   tiles,
   onSelect,
   shadows,
+  distanceByKey,
 }: {
   tiles: readonly LoadedTile[];
   onSelect: (building: SnapshotBuilding) => void;
   shadows: boolean;
+  /** Distance from the load focus per tile key, for distance-based detail. */
+  distanceByKey: ReadonlyMap<string, number>;
 }) {
   return (
     <group name="buildings">
@@ -104,7 +107,7 @@ export function BuildingsLayer({
           // Shadow casting is limited to tiles near the camera target: a
           // shadow map covering the entire study area at a useful resolution
           // is far more expensive than the visual gain at city scale.
-          castShadow={shadows && tile.distanceM < 700}
+          castShadow={shadows && (distanceByKey.get(tile.key) ?? 0) < 700}
         />
       ))}
     </group>

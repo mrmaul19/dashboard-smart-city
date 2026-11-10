@@ -75,7 +75,7 @@ export function CityView() {
 
   const manifestQuery = useCityManifest(cityId);
   const manifest = manifestQuery.data;
-  const { tiles, loadedCount, totalCount, isComplete } = useCityTiles(
+  const { tiles, distanceByKey, loadedCount, totalCount, isComplete } = useCityTiles(
     cityId,
     manifest,
   );
@@ -201,6 +201,7 @@ export function CityView() {
         onTrafficStats={setTrafficStats}
         transitRoutes={transit?.routes ?? EMPTY_ROUTES}
         transitStops={transit?.stops ?? EMPTY_STOPS}
+        distanceByKey={distanceByKey}
       />
 
       {/*

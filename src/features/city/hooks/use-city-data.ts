@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useQueries, useQuery } from '@tanstack/react-query';
+import { useQueries, useQuery, type UseQueryResult } from '@tanstack/react-query';
 import {
   fetchCityManifest,
   fetchCityTile,
@@ -46,8 +46,50 @@ interface UseCityTilesOptions {
   radiusM?: number;
 }
 
-export interface LoadedTile extends CityTile {
-  readonly distanceM: number;
+/**
+ * A loaded tile is the snapshot data itself.
+ *
+ * Deliberately **not** a wrapper object. The renderer memoises merged geometry
+ * per tile and the traffic graph per road set, so cloning the data into
+ * `{ ...tile, distanceM }` on every render gave every tile a new identity and
+ * caused all 23 tiles' geometry to be rebuilt — and the traffic simulation to
+ * be reconstructed, resetting every vehicle to a random position — several
+ * times a second. That showed up as the whole scene juddering. Per-tile
+ * distance is published separately, via `distanceByKey`.
+ */
+export type LoadedTile = CityTile;
+
+/**
+ * Default focus point, defined once at module scope.
+ *
+ * A `[0, 0]` default written in the parameter list would be a fresh array on
+ * every call, invalidating every memo that depends on it on every render.
+ */
+const DEFAULT_FOCUS: readonly [number, number] = [0, 0];
+
+/**
+ * Reduce the per-tile query results to the loaded tiles.
+ *
+ * Defined at module scope so the function identity is stable, and it pushes
+ * `result.data` straight through without copying. Both matter: TanStack applies
+ * structural sharing to a combined result, and because each element is the
+ * identical reference as last render, that comparison short-circuits per
+ * element and hands back the *previous array* whenever membership is
+ * unchanged. That is what keeps the scene's memos intact between renders.
+ */
+function combineTiles(results: UseQueryResult<CityTile, Error>[]): {
+  tiles: CityTile[];
+  errors: Error[];
+} {
+  const tiles: CityTile[] = [];
+  const errors: Error[] = [];
+
+  for (const result of results) {
+    if (result.data) tiles.push(result.data);
+    if (result.error instanceof Error) errors.push(result.error);
+  }
+
+  return { tiles, errors };
 }
 
 /**
@@ -61,7 +103,7 @@ export interface LoadedTile extends CityTile {
 export function useCityTiles(
   cityId: string,
   manifest: CityManifest | undefined,
-  { focus = [0, 0], radiusM = 1_600 }: UseCityTilesOptions = {},
+  { focus = DEFAULT_FOCUS, radiusM = 1_600 }: UseCityTilesOptions = {},
 ) {
   // Sorting nearest-first makes the city fill in from the camera outward.
   const wanted = useMemo(() => {
@@ -75,35 +117,31 @@ export function useCityTiles(
       .sort((a, b) => a.distanceM - b.distanceM);
   }, [manifest, focus, radiusM]);
 
-  const queries = useQueries({
+  const { tiles, errors } = useQueries({
     queries: wanted.map((tile) => ({
       queryKey: cityTileKey(cityId, tile.file),
       queryFn: () => fetchCityTile(cityId, tile.file),
       ...SNAPSHOT_QUERY_OPTIONS,
     })),
+    combine: combineTiles,
   });
 
-  const tiles = useMemo(() => {
-    const loaded: LoadedTile[] = [];
-    queries.forEach((query, index) => {
-      if (query.data) {
-        loaded.push({ ...query.data, distanceM: wanted[index].distanceM });
-      }
-    });
-    return loaded;
-  }, [queries, wanted]);
+  /** Distance from the focus point per tile key, for distance-based detail. */
+  const distanceByKey = useMemo(
+    () => new Map(wanted.map((tile) => [tile.key, tile.distanceM])),
+    [wanted],
+  );
 
   const loadedCount = tiles.length;
   const totalCount = wanted.length;
 
   return {
     tiles,
+    distanceByKey,
     loadedCount,
     totalCount,
     isLoading: totalCount > 0 && loadedCount === 0,
     isComplete: totalCount > 0 && loadedCount === totalCount,
-    errors: queries
-      .map((query) => query.error)
-      .filter((error): error is Error => error instanceof Error),
+    errors,
   };
 }

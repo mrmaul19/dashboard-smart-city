@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Grid } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { CameraRig } from '@/three/controls/camera-rig';
@@ -105,6 +105,7 @@ interface CitySceneProps {
   onTrafficStats?: (stats: TrafficStats) => void;
   transitRoutes: readonly TransitRoute[];
   transitStops: readonly TransitStop[];
+  distanceByKey: ReadonlyMap<string, number>;
 }
 
 export function CityScene({
@@ -123,8 +124,11 @@ export function CityScene({
   onTrafficStats,
   transitRoutes,
   transitStops,
+  distanceByKey,
 }: CitySceneProps) {
-  const roads = tiles.flatMap((tile) => tile.roads);
+  // Memoised: TrafficLayer keys the road graph and the simulation on this
+  // array, so a fresh identity each render would rebuild both.
+  const roads = useMemo(() => tiles.flatMap((tile) => tile.roads), [tiles]);
 
   return (
     <>
@@ -196,6 +200,7 @@ export function CityScene({
           tiles={tiles}
           onSelect={onSelectBuilding}
           shadows={shadows}
+          distanceByKey={distanceByKey}
         />
       ) : null}
       {layers.facilities ? (

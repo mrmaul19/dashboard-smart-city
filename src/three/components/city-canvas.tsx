@@ -49,6 +49,7 @@ export interface CityCanvasProps {
   onTrafficStats?: (stats: TrafficStats) => void;
   transitRoutes: readonly TransitRoute[];
   transitStops: readonly TransitStop[];
+  distanceByKey: ReadonlyMap<string, number>;
 }
 
 export default function CityCanvas({
@@ -62,7 +63,11 @@ export default function CityCanvas({
       // resolution quadruples the fragment cost for little visible gain here.
       dpr={[1, 1.75]}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
-      camera={{ fov: 45, near: 1, far: 9000, position: [620, 430, 620] }}
+      // A tighter depth range gives the buffer more precision to separate
+      // the near-coplanar ground layers (ground, grid, parks, roads), which
+      // otherwise shimmer against each other at distance. The scene is only
+      // ~1.6 km across, so 9000 of far plane bought nothing.
+      camera={{ fov: 45, near: 2, far: 6000, position: [620, 430, 620] }}
       // Regression to 50% of the target frame rate is allowed before the
       // adaptive DPR kicks in, which keeps interaction responsive on weaker
       // GPUs instead of dropping frames.
