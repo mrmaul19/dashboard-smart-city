@@ -137,7 +137,7 @@ export interface FetchWeatherOptions {
   timezone: string;
   /** Days of forecast, 0–16 per the documented range. */
   forecastDays?: number;
-  /** Days of history, 0–92. One day of hourly history feeds the trend views. */
+  /** Days of history, 0–92 per the documented range. Feeds the trend charts. */
   pastDays?: number;
   /** Abort budget, so a slow upstream cannot hold our route open. */
   timeoutMs?: number;
@@ -148,7 +148,10 @@ export function buildForecastUrl({
   lon,
   timezone,
   forecastDays = 7,
-  pastDays = 1,
+  // A week of hourly history is what the analytics charts plot. It costs
+  // nothing extra upstream — the same single request returns it — and keeps
+  // the trend views from needing a second endpoint.
+  pastDays = 7,
 }: FetchWeatherOptions): string {
   const params = new URLSearchParams({
     latitude: lat.toFixed(4),

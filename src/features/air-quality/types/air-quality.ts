@@ -62,6 +62,13 @@ export interface RateLimitInfo {
   readonly resetSeconds: number | null;
 }
 
+/** One hourly aggregate point for a pollutant. */
+export interface PollutantHourPoint {
+  /** ISO 8601 UTC instant at the end of the hour. */
+  readonly time: string;
+  readonly value: number | null;
+}
+
 export interface AirQualityPayload {
   /** False when `OPENAQ_API_KEY` is not set; everything is then UNAVAILABLE. */
   readonly keyConfigured: boolean;
@@ -74,6 +81,15 @@ export interface AirQualityPayload {
   readonly aqi: DataEnvelope<AqiSummary>;
   /** Pollutants left out of the AQI, with the reason for each. */
   readonly excluded: readonly ExcludedPollutant[];
+  /**
+   * Hourly history per pollutant, oldest first.
+   *
+   * These come from the same `/hours` requests the AQI already needs, so the
+   * trend charts cost no additional upstream quota.
+   */
+  readonly history: Partial<Record<PollutantKey, readonly PollutantHourPoint[]>>;
+  /** Unit each history series is reported in, as the station reports it. */
+  readonly historyUnits: Partial<Record<PollutantKey, string>>;
   readonly rateLimit: RateLimitInfo | null;
 }
 

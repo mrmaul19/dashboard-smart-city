@@ -17,6 +17,7 @@ import {
 } from '../utils/aqi';
 import type {
   AirQualityPayload,
+  PollutantHourPoint,
   AqiSummary,
   ExcludedPollutant,
   RateLimitInfo,
@@ -316,6 +317,8 @@ export async function fetchAirQuality({
         note: `No OpenAQ monitoring station within ${(radius / 1000).toFixed(0)} km of this location.`,
       }),
       excluded: [],
+      history: {},
+      historyUnits: {},
       rateLimit,
     };
   }
@@ -340,6 +343,8 @@ export async function fetchAirQuality({
         note: `${stations.length} station(s) in range, but none measure PM2.5, PM10, O₃, NO₂, SO₂ or CO.`,
       }),
       excluded: [],
+      history: {},
+      historyUnits: {},
       rateLimit,
     };
   }
@@ -399,7 +404,13 @@ export async function fetchAirQuality({
     }
   }
 
-  const { aqi, excluded, rateLimit: aqiRateLimit } = await computeAqi(
+  const {
+    aqi,
+    excluded,
+    rateLimit: aqiRateLimit,
+    history,
+    historyUnits,
+  } = await computeAqi(
     primary,
     apiKey,
     source,
@@ -416,6 +427,8 @@ export async function fetchAirQuality({
     readings,
     aqi,
     excluded,
+    history,
+    historyUnits,
     rateLimit: aqiRateLimit ?? rateLimit,
   };
 }
@@ -439,9 +452,13 @@ async function computeAqi(
   aqi: DataEnvelope<AqiSummary>;
   excluded: ExcludedPollutant[];
   rateLimit: RateLimitInfo | null;
+  history: Partial<Record<PollutantKey, PollutantHourPoint[]>>;
+  historyUnits: Partial<Record<PollutantKey, string>>;
 }> {
   const excluded: ExcludedPollutant[] = [];
   const contributions: PollutantAqi[] = [];
+  const history: Partial<Record<PollutantKey, PollutantHourPoint[]>> = {};
+  const historyUnits: Partial<Record<PollutantKey, string>> = {};
   let rateLimit: RateLimitInfo | null = null;
   let newestMeasurement: string | null = null;
 
@@ -489,6 +506,16 @@ async function computeAqi(
       excluded.push({ pollutant, reason: 'No hourly aggregates available.' });
       continue;
     }
+
+    // Chronological for charting, which is the opposite of the NowCast order.
+    history[pollutant] = [...ordered]
+      .reverse()
+      .map((hour) => ({
+        time: hour.period?.datetimeTo?.utc ?? '',
+        value: typeof hour.value === 'number' ? hour.value : null,
+      }))
+      .filter((point) => point.time !== '');
+    historyUnits[pollutant] = sensor.units;
 
     const newest = ordered[0]?.period?.datetimeTo?.utc ?? null;
     if (newest && (!newestMeasurement || newest > newestMeasurement)) {
@@ -576,6 +603,8 @@ async function computeAqi(
       }),
       excluded,
       rateLimit,
+      history,
+      historyUnits,
     };
   }
 
@@ -606,6 +635,8 @@ async function computeAqi(
     }),
     excluded,
     rateLimit,
+    history,
+    historyUnits,
   };
 }
 
@@ -623,6 +654,8 @@ export function unconfiguredPayload(radiusM = MAX_RADIUS_M): AirQualityPayload {
       note: 'OPENAQ_API_KEY is not set, so no air-quality data can be requested. Register free at explore.openaq.org/register.',
     }),
     excluded: [],
+    history: {},
+    historyUnits: {},
     rateLimit: null,
   };
 }
