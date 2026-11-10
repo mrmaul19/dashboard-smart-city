@@ -1,0 +1,403 @@
+{
+  "city": "jakarta",
+  "generatedAt": "2026-11-06T13:49:30.213Z",
+  "origin": {
+    "lat": -6.2088,
+    "lon": 106.8456
+  },
+  "bbox": {
+    "minLat": -6.215584874253664,
+    "maxLat": -6.202015125746336,
+    "minLon": 106.83882291427456,
+    "maxLon": 106.85237708572545
+  },
+  "tileSizeM": 500,
+  "extentM": 750,
+  "source": {
+    "adapter": "overpass",
+    "endpoint": "https://overpass-api.de/api/interpreter",
+    "licence": "ODbL 1.0",
+    "attribution": "© OpenStreetMap contributors"
+  },
+  "counts": {
+    "buildings": 8119,
+    "roads": 750,
+    "green": 17,
+    "facilities": 148
+  },
+  "heightTagCoverage": {
+    "osmHeight": 1,
+    "osmLevels": 128,
+    "derived": 7990
+  },
+  "tiles": [
+    {
+      "key": "-1_0",
+      "col": -1,
+      "row": 0,
+      "centre": [
+        -1000,
+        -500
+      ],
+      "file": "tiles/-1_0.json",
+      "counts": {
+        "buildings": 5,
+        "roads": 3,
+        "green": 0,
+        "facilities": 0
+      }
+    },
+    {
+      "key": "-1_1",
+      "col": -1,
+      "row": 1,
+      "centre": [
+        -1000,
+        0
+      ],
+      "file": "tiles/-1_1.json",
+      "counts": {
+        "buildings": 11,
+        "roads": 9,
+        "green": 0,
+        "facilities": 0
+      }
+    },
+    {
+      "key": "-1_2",
+      "col": -1,
+      "row": 2,
+      "centre": [
+        -1000,
+        500
+      ],
+      "file": "tiles/-1_2.json",
+      "counts": {
+        "buildings": 16,
+        "roads": 4,
+        "green": 0,
+        "facilities": 0
+      }
+    },
+    {
+      "key": "0_-1",
+      "col": 0,
+      "row": -1,
+      "centre": [
+        -500,
+        -1000
+      ],
+      "file": "tiles/0_-1.json",
+      "counts": {
+        "buildings": 6,
+        "roads": 1,
+        "green": 0,
+        "facilities": 1
+      }
+    },
+    {
+      "key": "0_-2",
+      "col": 0,
+      "row": -2,
+      "centre": [
+        -500,
+        -1500
+      ],
+      "file": "tiles/0_-2.json",
+      "counts": {
+        "buildings": 0,
+        "roads": 1,
+        "green": 0,
+        "facilities": 0
+      }
+    },
+    {
+      "key": "0_0",
+      "col": 0,
+      "row": 0,
+      "centre": [
+        -500,
+        -500
+      ],
+      "file": "tiles/0_0.json",
+      "counts": {
+        "buildings": 553,
+        "roads": 56,
+        "green": 1,
+        "facilities": 7
+      }
+    },
+    {
+      "key": "0_1",
+      "col": 0,
+      "row": 1,
+      "centre": [
+        -500,
+        0
+      ],
+      "file": "tiles/0_1.json",
+      "counts": {
+        "buildings": 1184,
+        "roads": 72,
+        "green": 2,
+        "facilities": 18
+      }
+    },
+    {
+      "key": "0_2",
+      "col": 0,
+      "row": 2,
+      "centre": [
+        -500,
+        500
+      ],
+      "file": "tiles/0_2.json",
+      "counts": {
+        "buildings": 1477,
+        "roads": 94,
+        "green": 0,
+        "facilities": 12
+      }
+    },
+    {
+      "key": "0_3",
+      "col": 0,
+      "row": 3,
+      "centre": [
+        -500,
+        1000
+      ],
+      "file": "tiles/0_3.json",
+      "counts": {
+        "buildings": 17,
+        "roads": 1,
+        "green": 0,
+        "facilities": 0
+      }
+    },
+    {
+      "key": "1_-1",
+      "col": 1,
+      "row": -1,
+      "centre": [
+        0,
+        -1000
+      ],
+      "file": "tiles/1_-1.json",
+      "counts": {
+        "buildings": 8,
+        "roads": 3,
+        "green": 0,
+        "facilities": 2
+      }
+    },
+    {
+      "key": "1_0",
+      "col": 1,
+      "row": 0,
+      "centre": [
+        0,
+        -500
+      ],
+      "file": "tiles/1_0.json",
+      "counts": {
+        "buildings": 870,
+        "roads": 81,
+        "green": 1,
+        "facilities": 11
+      }
+    },
+    {
+      "key": "1_1",
+      "col": 1,
+      "row": 1,
+      "centre": [
+        0,
+        0
+      ],
+      "file": "tiles/1_1.json",
+      "counts": {
+        "buildings": 971,
+        "roads": 75,
+        "green": 2,
+        "facilities": 20
+      }
+    },
+    {
+      "key": "1_2",
+      "col": 1,
+      "row": 2,
+      "centre": [
+        0,
+        500
+      ],
+      "file": "tiles/1_2.json",
+      "counts": {
+        "buildings": 816,
+        "roads": 112,
+        "green": 0,
+        "facilities": 21
+      }
+    },
+    {
+      "key": "1_3",
+      "col": 1,
+      "row": 3,
+      "centre": [
+        0,
+        1000
+      ],
+      "file": "tiles/1_3.json",
+      "counts": {
+        "buildings": 28,
+        "roads": 6,
+        "green": 0,
+        "facilities": 0
+      }
+    },
+    {
+      "key": "2_-1",
+      "col": 2,
+      "row": -1,
+      "centre": [
+        500,
+        -1000
+      ],
+      "file": "tiles/2_-1.json",
+      "counts": {
+        "buildings": 8,
+        "roads": 5,
+        "green": 0,
+        "facilities": 0
+      }
+    },
+    {
+      "key": "2_0",
+      "col": 2,
+      "row": 0,
+      "centre": [
+        500,
+        -500
+      ],
+      "file": "tiles/2_0.json",
+      "counts": {
+        "buildings": 702,
+        "roads": 82,
+        "green": 3,
+        "facilities": 22
+      }
+    },
+    {
+      "key": "2_1",
+      "col": 2,
+      "row": 1,
+      "centre": [
+        500,
+        0
+      ],
+      "file": "tiles/2_1.json",
+      "counts": {
+        "buildings": 837,
+        "roads": 98,
+        "green": 5,
+        "facilities": 25
+      }
+    },
+    {
+      "key": "2_2",
+      "col": 2,
+      "row": 2,
+      "centre": [
+        500,
+        500
+      ],
+      "file": "tiles/2_2.json",
+      "counts": {
+        "buildings": 566,
+        "roads": 32,
+        "green": 0,
+        "facilities": 7
+      }
+    },
+    {
+      "key": "2_3",
+      "col": 2,
+      "row": 3,
+      "centre": [
+        500,
+        1000
+      ],
+      "file": "tiles/2_3.json",
+      "counts": {
+        "buildings": 12,
+        "roads": 1,
+        "green": 1,
+        "facilities": 1
+      }
+    },
+    {
+      "key": "3_-1",
+      "col": 3,
+      "row": -1,
+      "centre": [
+        1000,
+        -1000
+      ],
+      "file": "tiles/3_-1.json",
+      "counts": {
+        "buildings": 0,
+        "roads": 1,
+        "green": 0,
+        "facilities": 0
+      }
+    },
+    {
+      "key": "3_0",
+      "col": 3,
+      "row": 0,
+      "centre": [
+        1000,
+        -500
+      ],
+      "file": "tiles/3_0.json",
+      "counts": {
+        "buildings": 14,
+        "roads": 6,
+        "green": 1,
+        "facilities": 1
+      }
+    },
+    {
+      "key": "3_1",
+      "col": 3,
+      "row": 1,
+      "centre": [
+        1000,
+        0
+      ],
+      "file": "tiles/3_1.json",
+      "counts": {
+        "buildings": 16,
+        "roads": 4,
+        "green": 1,
+        "facilities": 0
+      }
+    },
+    {
+      "key": "3_2",
+      "col": 3,
+      "row": 2,
+      "centre": [
+        1000,
+        500
+      ],
+      "file": "tiles/3_2.json",
+      "counts": {
+        "buildings": 2,
+        "roads": 3,
+        "green": 0,
+        "facilities": 0
+      }
+    }
+  ]
+}

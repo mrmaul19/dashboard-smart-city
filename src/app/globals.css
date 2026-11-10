@@ -1,26 +1,222 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Smart City Digital Twin — design tokens.
+ *
+ * Dark is the primary theme: a command centre is read in a dimmed room and sits
+ * behind a 3D scene, so the chrome stays low-luminance and the accent colours
+ * carry meaning rather than decoration. A light theme is provided for daylight
+ * use and is selected by `data-theme="light"` on <html>; both themes share the
+ * same token names so components never branch on theme.
+ */
+
+:root,
+:root[data-theme="dark"] {
+  /* Surfaces, from furthest back to furthest forward. */
+  --app-bg: #060910;
+  --app-surface: #0b111c;
+  --app-surface-2: #111a28;
+  --app-surface-3: #18243580;
+  --app-border: #1d2a3c;
+  --app-border-strong: #2b3c52;
+
+  /* Text. */
+  --app-text: #e6edf6;
+  --app-text-muted: #93a4bb;
+  --app-text-dim: #5f7489;
+
+  /* Accent: cyan reads as "instrumentation" without competing with status hues. */
+  --app-accent: #22d3ee;
+  --app-accent-soft: #22d3ee1f;
+  --app-accent-text: #67e8f9;
+
+  /* Provenance colours (spec §11) — the only semantic colours in the chrome. */
+  --app-real: #34d399;
+  --app-real-soft: #34d39921;
+  --app-sim: #fbbf24;
+  --app-sim-soft: #fbbf2421;
+  --app-static: #60a5fa;
+  --app-static-soft: #60a5fa21;
+  --app-na: #94a3b8;
+  --app-na-soft: #94a3b81f;
+
+  /* Status. */
+  --app-ok: #34d399;
+  --app-warn: #fbbf24;
+  --app-danger: #f87171;
+
+  --app-grid-line: #16263a;
 }
 
+:root[data-theme="light"] {
+  --app-bg: #f1f5f9;
+  --app-surface: #ffffff;
+  --app-surface-2: #f8fafc;
+  --app-surface-3: #e2e8f080;
+  --app-border: #d8e0ea;
+  --app-border-strong: #b6c2d2;
+
+  --app-text: #0f1b2d;
+  --app-text-muted: #4a5a70;
+  --app-text-dim: #74859c;
+
+  --app-accent: #0e7490;
+  --app-accent-soft: #0e749014;
+  --app-accent-text: #0e7490;
+
+  --app-real: #047857;
+  --app-real-soft: #04785714;
+  --app-sim: #b45309;
+  --app-sim-soft: #b4530914;
+  --app-static: #1d4ed8;
+  --app-static-soft: #1d4ed814;
+  --app-na: #64748b;
+  --app-na-soft: #64748b14;
+
+  --app-ok: #047857;
+  --app-warn: #b45309;
+  --app-danger: #b91c1c;
+
+  --app-grid-line: #dde5ef;
+}
+
+/* Expose the tokens to Tailwind as `bg-surface`, `text-muted`, etc. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-bg: var(--app-bg);
+  --color-surface: var(--app-surface);
+  --color-surface-2: var(--app-surface-2);
+  --color-surface-3: var(--app-surface-3);
+  --color-border-subtle: var(--app-border);
+  --color-border-strong: var(--app-border-strong);
+
+  --color-fg: var(--app-text);
+  --color-muted: var(--app-text-muted);
+  --color-dim: var(--app-text-dim);
+
+  --color-accent: var(--app-accent);
+  --color-accent-soft: var(--app-accent-soft);
+  --color-accent-text: var(--app-accent-text);
+
+  --color-real: var(--app-real);
+  --color-real-soft: var(--app-real-soft);
+  --color-sim: var(--app-sim);
+  --color-sim-soft: var(--app-sim-soft);
+  --color-static: var(--app-static);
+  --color-static-soft: var(--app-static-soft);
+  --color-na: var(--app-na);
+  --color-na-soft: var(--app-na-soft);
+
+  --color-ok: var(--app-ok);
+  --color-warn: var(--app-warn);
+  --color-danger: var(--app-danger);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--app-border);
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  html[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--app-bg);
+    color: var(--app-text);
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+    /* A faint grid reinforces the instrumentation feel at almost no cost. */
+    background-image:
+      linear-gradient(to right, var(--app-grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--app-grid-line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    background-attachment: fixed;
+  }
+
+  /* Visible, consistent keyboard focus everywhere (spec §10 accessibility). */
+  :focus-visible {
+    outline: 2px solid var(--app-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--app-border-strong);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Standard panel chrome, used by every dashboard surface. */
+  .panel {
+    background-color: color-mix(in srgb, var(--app-surface) 92%, transparent);
+    border: 1px solid var(--app-border);
+    border-radius: 0.5rem;
+    backdrop-filter: blur(8px);
+  }
+
+  .panel-heading {
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--app-text-muted);
+  }
+
+  /* Monospace numerals keep live-updating readouts from shifting width. */
+  .readout {
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .live-dot {
+    position: relative;
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background-color: var(--app-ok);
+  }
+
+  .live-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    background-color: var(--app-ok);
+    animation: app-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  @keyframes app-ping {
+    75%,
+    100% {
+      transform: scale(2.4);
+      opacity: 0;
+    }
+  }
 }

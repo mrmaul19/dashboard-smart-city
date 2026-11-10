@@ -10,6 +10,10 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
+    // The snapshot generator in scripts/ runs under plain Node, whose TypeScript
+    // support requires explicit .ts extensions on value imports. Safe with
+    // noEmit: it only relaxes which specifiers tsc accepts.
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,

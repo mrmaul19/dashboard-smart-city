@@ -1,0 +1,31 @@
+{
+  "city": "jakarta",
+  "generatedAt": "2026-11-06T17:44:43.661Z",
+  "feedLastModified": "Fri, 06 Nov 2026 09:25:07 GMT",
+  "origin": {
+    "lat": -6.2088,
+    "lon": 106.8456
+  },
+  "agency": {
+    "name": "PT Transportasi Jakarta",
+    "url": "https://transjakarta.co.id/",
+    "timezone": "Asia/Jakarta"
+  },
+  "source": {
+    "url": "https://gtfs.transjakarta.co.id/files/file_gtfs.zip",
+    "licence": "Published openly by the operator; no explicit licence stated",
+    "attribution": "Schedule data: PT Transportasi Jakarta"
+  },
+  "feedTotals": {
+    "routes": 241,
+    "stops": 8143,
+    "trips": 694,
+    "shapePoints": 244346,
+    "frequencies": 747
+  },
+  "counts": {
+    "routes": 13,
+    "stops": 34,
+    "fragments": 24
+  }
+}
